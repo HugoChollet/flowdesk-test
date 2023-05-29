@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
-import { SelectChangeEvent } from "@mui/material";
+import { Button, SelectChangeEvent } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 
 import styles from "./page.module.css";
 import { Selector } from "./component/Selector.component";
 import { getData } from "./api/getData";
+import { TradeData } from "./component/TradeData.type";
+import TradeCard from "./component/TradeCard.component";
 
 type CurrencyType = {
   from: string;
@@ -14,6 +17,7 @@ type CurrencyType = {
 export default function Home() {
   const [coinList, setCoinList] = useState<Array<string>>();
   const [currency, setCurrency] = useState<CurrencyType>();
+  const [trade, setTrade] = useState<Array<TradeData>>();
 
   useEffect(() => {
     getData("https://api.binance.com/api/v1/exchangeInfo").then((data) => {
@@ -32,6 +36,15 @@ export default function Home() {
     }
   };
 
+  const fetchPublicMarketData = () => {
+    getData(
+      "https://api.binance.com/api/v3/trades?symbol=" + currency?.from
+    ).then((data) => {
+      console.log(data);
+      setTrade(data);
+    });
+  };
+
   return (
     <div className={styles.main}>
       <Selector
@@ -40,6 +53,15 @@ export default function Home() {
         onChange={handleChange}
       />
       <Selector label="To :" values={coinList || []} onChange={handleChange} />
+      <Button
+        variant="contained"
+        disabled={currency && currency.from && currency.to ? false : true}
+        endIcon={<SendIcon />}
+        onClick={fetchPublicMarketData}
+      >
+        See Data
+      </Button>
+      {trade ? <TradeCard tradeData={trade[0]} /> : null}
     </div>
   );
 }
