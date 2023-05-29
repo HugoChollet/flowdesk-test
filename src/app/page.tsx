@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button, SelectChangeEvent } from "@mui/material";
+import { Button, Divider, SelectChangeEvent } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
 import styles from "./page.module.css";
@@ -73,6 +73,8 @@ export default function Home() {
             name={currency?.from || ""}
           />
         ) : null}
+
+        <Divider orientation="vertical" flexItem style={{ margin: 48 }} />
         {tradeTo ? (
           <TradeCardList tradeDataArray={tradeTo} name={currency?.to || ""} />
         ) : null}
