@@ -7,7 +7,7 @@ import styles from "./page.module.css";
 import { Selector } from "./component/Selector.component";
 import { getData } from "./api/getData";
 import { TradeData } from "./component/TradeData.type";
-import TradeCard from "./component/TradeCard.component";
+import TradeCardList from "./component/TradeCardList.component";
 
 type CurrencyType = {
   from: string;
@@ -17,7 +17,8 @@ type CurrencyType = {
 export default function Home() {
   const [coinList, setCoinList] = useState<Array<string>>();
   const [currency, setCurrency] = useState<CurrencyType>();
-  const [trade, setTrade] = useState<Array<TradeData>>();
+  const [tradeFrom, setTradeFrom] = useState<Array<TradeData>>();
+  const [tradeTo, setTradeTo] = useState<Array<TradeData>>();
 
   useEffect(() => {
     getData("https://api.binance.com/api/v1/exchangeInfo").then((data) => {
@@ -40,8 +41,12 @@ export default function Home() {
     getData(
       "https://api.binance.com/api/v3/trades?symbol=" + currency?.from
     ).then((data) => {
-      console.log(data);
-      setTrade(data);
+      setTradeFrom(data);
+    });
+    getData(
+      "https://api.binance.com/api/v3/trades?symbol=" + currency?.to
+    ).then((data) => {
+      setTradeTo(data);
     });
   };
 
@@ -61,7 +66,17 @@ export default function Home() {
       >
         See Data
       </Button>
-      {trade ? <TradeCard tradeData={trade[0]} /> : null}
+      <div className={styles.listsContainer}>
+        {tradeFrom ? (
+          <TradeCardList
+            tradeDataArray={tradeFrom}
+            name={currency?.from || ""}
+          />
+        ) : null}
+        {tradeTo ? (
+          <TradeCardList tradeDataArray={tradeTo} name={currency?.to || ""} />
+        ) : null}
+      </div>
     </div>
   );
 }
